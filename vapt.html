@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAPT Services | NATIVEDEFENCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. GLOBAL VARIABLES & RESET --- */
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #0099aa;
+            --secondary: #7b2fff;
+            --accent: #7b00ff;
+            --neon-green: #00ff88;
+            --neon-pink: #0044ff;
+            --alert: #ff3366;
+            --bg-body: #030508;
+            --bg-glass: rgba(12, 16, 28, 0.7);
+            --bg-card: rgba(20, 25, 40, 0.6);
+            --text-white: #ffffff;
+            --text-gray: #a0aab8;
+            --gradient-cyber: linear-gradient(135deg, #00f5ff, #7b2fff, #ff0055);
+            --gradient-neon: linear-gradient(135deg, #00ff88, #00f5ff, #7b2fff);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* --- ANIMATED BACKGROUND --- */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(0deg); }
+            100% { transform: perspective(500px) rotateX(0deg) translateY(60px); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100vh) translateX(100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Scanning Line Effect */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scanDown 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        @keyframes scanDown {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* --- HEADER --- */
+        header {
+            background: rgba(3, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 0 5%;
+            height: 80px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            height: 70px;
+            background: rgba(3, 5, 8, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan-line-header 3s linear infinite;
+        }
+
+        @keyframes scan-line-header {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 1px;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .logo img {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.3));
+        }
+
+        .logo img:hover {
+            filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.6));
+            transform: scale(1.05);
+        }
+
+        /* --- DESKTOP NAV --- */
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .nav-links li {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links > li > a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-gray);
+            padding: 10px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links > li > a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-cyber);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links > li > a:hover::before,
+        .nav-links > li > a.active::before {
+            width: 100%;
+        }
+
+        .nav-links > li > a:hover,
+        .nav-links > li > a.active {
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+        }
+
+        .nav-links > li > a i {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links > li:hover > a i {
+            transform: rotate(180deg);
+        }
+
+        /* --- DROPDOWNS --- */
+        .dropdown-menu {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            background: rgba(10, 14, 24, 0.98);
+            min-width: 260px;
+            border: 1px solid rgba(0, 245, 255, 0.15);
+            border-top: 3px solid;
+            border-image: var(--gradient-cyber) 1;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8),
+                        0 0 30px rgba(0, 245, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: block;
+            padding: 15px 0;
+            z-index: 999;
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-links li:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-menu li {
+            height: auto;
+            overflow: hidden;
+        }
+
+        .dropdown-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dropdown-menu li a::before {
+            content: '▹';
+            margin-right: 10px;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu li a:hover {
+            background: linear-gradient(90deg, rgba(0, 245, 255, 0.1), transparent);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            padding-left: 30px;
+        }
+
+        .dropdown-menu li a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- CTA BUTTON IN NAV --- */
+        .cta-btn-nav {
+            padding: 12px 30px !important;
+            background: transparent;
+            border: 2px solid transparent;
+            background-image: linear-gradient(var(--bg-body), var(--bg-body)), var(--gradient-cyber);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            border-radius: 8px;
+            height: auto;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--primary) !important;
+            transition: all 0.4s ease;
+        }
+
+        .cta-btn-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-cyber);
+            transition: 0.5s ease;
+            z-index: -1;
+        }
+
+        .cta-btn-nav:hover::before { 
+            left: 0; 
+        }
+
+        .cta-btn-nav:hover { 
+            color: #000 !important; 
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.5),
+                        0 0 60px rgba(123, 47, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* --- MOBILE HAMBURGER ICON --- */
+        .mobile-menu {
+            display: none;
+            font-size: 1.8rem;
+            color: var(--text-white);
+            cursor: pointer;
+            z-index: 1001;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu:hover {
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--primary);
+        }
+
+        /* --- HERO SECTION --- */
+        .vapt-hero {
+            padding: 160px 5% 80px;
+            background: radial-gradient(circle at top left, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(123, 47, 255, 0.05) 0%, transparent 50%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vapt-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.03) 0%, transparent 70%);
+            animation: rotate-gradient 20s linear infinite;
+        }
+
+        @keyframes rotate-gradient {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .vapt-hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            background: var(--gradient-cyber);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            animation: fadeInUp 1s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vapt-hero p {
+            max-width: 900px;
+            margin: 0 auto 30px;
+            color: var(--text-gray);
+            font-size: 1.2rem;
+            line-height: 1.8;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        /* --- SERVICES SPLIT SECTION --- */
+        .services-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 100px 10%;
+            position: relative;
+        }
+
+        .service-block {
+            background: linear-gradient(145deg, rgba(20, 25, 40, 0.8), rgba(10, 15, 30, 0.9));
+            padding: 50px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .service-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-cyber);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .service-block:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-block::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .service-block:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
+                        0 0 50px rgba(0, 245, 255, 0.1);
+        }
+
+        .service-block:hover::after {
+            opacity: 1;
+        }
+
+        .service-block h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+        }
+
+        .service-block i { 
+            color: var(--primary);
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px currentColor);
+            animation: iconPulse 2s infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .service-block p {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        /* --- PROCESS WORKFLOW --- */
+        .process-section {
+            background: linear-gradient(180deg, rgba(8, 9, 15, 0.5) 0%, var(--bg-body) 100%);
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 60px;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title span { 
+            background: var(--gradient-cyber);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .process-step {
+            background: linear-gradient(145deg, rgba(20, 25, 40, 0.6), rgba(10, 15, 30, 0.8));
+            padding: 35px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 40%, rgba(0, 245, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .process-step:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                        0 0 30px rgba(0, 245, 255, 0.05);
+        }
+
+        .process-step:hover::before {
+            opacity: 1;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--gradient-cyber);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #000;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .process-step h3 {
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-white);
+            font-size: 1.3rem;
+        }
+
+        .process-step p { 
+            font-size: 0.95rem; 
+            color: var(--text-gray); 
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .process-step strong { 
+            color: var(--primary); 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* --- INDUSTRIES --- */
+        .industry-grid {
+            padding: 100px 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.02) 0%, transparent 50%, rgba(123, 47, 255, 0.02) 100%);
+        }
+
+        .industry-card {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(145deg, rgba(20, 25, 40, 0.6), rgba(10, 15, 30, 0.8));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .industry-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform: rotate(45deg);
+        }
+
+        .industry-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .industry-card:hover::after {
+            opacity: 1;
+        }
+
+        .industry-card i {
+            font-size: 3rem;
+            background: var(--gradient-cyber);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 10px rgba(0, 245, 255, 0.2));
+        }
+
+        .industry-card h3 { 
+            margin-bottom: 15px; 
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+
+        .industry-card p { 
+            font-size: 0.95rem; 
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* --- THREAT INTEL SECTION --- */
+        .intel-section {
+            background: linear-gradient(180deg, var(--bg-body) 0%, rgba(8, 9, 15, 0.8) 100%);
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .intel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .intel-card {
+            background: linear-gradient(145deg, rgba(15, 18, 28, 0.9), rgba(8, 10, 18, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .intel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--gradient-cyber);
+            transition: height 0.5s ease;
+        }
+
+        .intel-card:hover {
+            border-color: var(--alert);
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        0 0 30px rgba(255, 51, 102, 0.05);
+        }
+
+        .intel-card:hover::before {
+            height: 100%;
+        }
+
+        .intel-header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cve-id { 
+            font-family: 'Orbitron', monospace; 
+            font-weight: 700; 
+            color: var(--text-white);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        
+        .severity {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sev-critical { 
+            background: rgba(255, 51, 102, 0.2); 
+            color: var(--alert); 
+            border: 1px solid var(--alert);
+            animation: pulse-critical 2s infinite;
+        }
+
+        @keyframes pulse-critical {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 51, 102, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+        }
+
+        .sev-high { 
+            background: rgba(255, 165, 0, 0.2); 
+            color: orange; 
+            border: 1px solid orange;
+        }
+
+        .intel-body { 
+            padding: 25px;
+        }
+
+        .intel-body h4 { 
+            font-size: 1.1rem; 
+            margin-bottom: 15px; 
+            color: var(--primary);
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .intel-detail {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .intel-detail span { 
+            color: var(--text-white); 
+            font-weight: 600;
+            min-width: 100px;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: linear-gradient(180deg, #020203 0%, #000 100%);
+            padding: 100px 5% 30px;
+            border-top: 1px solid rgba(0, 245, 255, 0.1);
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-cyber);
+            animation: footer-scan 5s linear infinite;
+        }
+
+        @keyframes footer-scan {
+            0% { transform: scaleX(0); }
+            50% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 30px;
+            color: #fff;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-links li { 
+            margin-bottom: 15px;
+        }
+
+        .footer-links a { 
+            color: var(--text-gray);
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 0;
+        }
+
+        .footer-links a::before {
+            content: '▹';
+            color: var(--primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            position: absolute;
+            left: -15px;
+        }
+
+        .footer-links a:hover { 
+            color: var(--primary); 
+            padding-left: 20px;
+        }
+
+        .footer-links a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .contact-info p {
+            margin-bottom: 20px;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        .contact-info i { 
+            color: var(--primary);
+            margin-top: 3px;
+            min-width: 20px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .mobile-menu { 
+                display: flex; 
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(3, 5, 8, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 40px 20px;
+                transition: 0.4s ease-in-out;
+                z-index: 998;
+                border-top: 1px solid rgba(0, 245, 255, 0.1);
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                height: auto;
+                flex-direction: column;
+                margin-bottom: 5px;
+            }
+
+            .nav-links > li > a {
+                font-size: 1.1rem;
+                width: 100%;
+                justify-content: center;
+                padding: 18px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .dropdown-menu {
+                position: static;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.3);
+                border: none;
+                box-shadow: none;
+                transform: none;
+                opacity: 1;
+                visibility: visible;
+                display: none;
+                padding: 10px 0;
+                margin-top: 0;
+            }
+            
+            .nav-links li:hover .dropdown-menu {
+                display: block;
+            }
+
+            .dropdown-menu li a {
+                padding-left: 40px;
+                text-align: left;
+            }
+
+            .services-split { 
+                grid-template-columns: 1fr; 
+                padding: 60px 5%; 
+            }
+            
+            .vapt-hero h1 { font-size: 2.2rem; }
+            .vapt-hero { padding: 120px 5% 60px; }
+            
+            .section-title { font-size: 2rem; margin-bottom: 40px; }
+            
+            .industry-grid { padding: 60px 5%; }
+            .intel-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="particles"></div>
+    <div class="scan-line"></div>
+
+    <header>
+        <div class="logo">
+            <img src="https://static.wixstatic.com/media/b12bd8_041938cd6f734a0aa2f940d3ef359f90~mv2.png/v1/fill/w_468,h_154,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/NATIVEDEFENCE_Logo1.png" 
+                 width="140px" height="50px" alt="Native Defence">
+        </div>
+        <nav>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li>
+                    <a href="nativesoc.html">NativeSOC <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="NativeARchitecture.html">NativeSOC Architecture</a></li>
+                        <li><a href="NativeApproach.html">NativeSOC Approach</a></li>
+                        <li><a href="NativeFeatures.html">NativeSOC Features</a></li>
+                        <li><a href="Whynative.html">Why NativeSOC</a></li>
+                        <li><a href="howitworks.html">How it works</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="academy.html">Academy <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="courses.html">Courses</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="vapt.html" class="active">VAPT <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="cyber.html">Cybersecurity</a></li>
+                    </ul>
+                </li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="aboutus.html">About Us</a></li>
+                <li><a href="contact.html" class="cta-btn-nav">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="mobile-menu" id="mobile-toggle"><i class="fas fa-bars"></i></div>
+    </header>
+
+    <section class="vapt-hero">
+        <h1>Fortify Your Digital Defenses</h1>
+        <p>At NativeDefence, we serve as your unwavering partner in strengthening your digital security. With a well-established history of excellence in Vulnerability Assessment and Penetration Testing (VAPT), we are dedicated to safeguarding your digital assets.</p>
+    </section>
+
+    <section class="services-split">
+        <div class="service-block">
+            <h2><i class="fas fa-search"></i> Vulnerability Assessment</h2>
+            <p>Uncover vulnerabilities in your digital infrastructure proactively. Our comprehensive assessment meticulously identifies weaknesses, empowering you to address and prioritize remediation effectively for enhanced security.</p>
+        </div>
+        <div class="service-block">
+            <h2><i class="fas fa-user-secret"></i> Penetration Testing</h2>
+            <p>Our team of ethical hackers specializes in emulating real-world cyberattacks. Through Penetration Testing, we reveal vulnerabilities that automated scans might overlook, guaranteeing the fortification of your defenses.</p>
+        </div>
+    </section>
+
+    <section class="process-section">
+        <h2 class="section-title">VAPT <span>Methodology</span></h2>
+        <div class="process-grid">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <h3>Scope</h3>
+                <p><strong>Goal:</strong> Define boundaries and limitations.</p>
+                <p>Clearly outline systems, applications, and networks to be tested along with specific goals.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <h3>Info Gathering</h3>
+                <p><strong>Goal:</strong> Collect essential environment info.</p>
+                <p>Understand architecture, attack surface, and conduct initial reconnaissance.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <h3>Vuln Detection</h3>
+                <p><strong>Goal:</strong> Identify weaknesses & misconfigurations.</p>
+                <p>Use automated tools and manual testing to discover security issues.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <h3>Analysis</h3>
+                <p><strong>Goal:</strong> Plan the penetration testing.</p>
+                <p>Evaluate potential risks and prioritize testing efforts based on gathered data.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">5</div>
+                <h3>Privilege Escalation</h3>
+                <p><strong>Goal:</strong> Gain deeper access.</p>
+                <p>Attempt to escalate privileges to assess the full extent of potential breaches.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">6</div>
+                <h3>Result Analysis</h3>
+                <p><strong>Goal:</strong> Analyze impact.</p>
+                <p>Understand the significance and potential consequences of identified weaknesses.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">7</div>
+                <h3>Reporting</h3>
+                <p><strong>Goal:</strong> Document findings.</p>
+                <p>Create a clear, actionable report for stakeholders with recommendations.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">8</div>
+                <h3>Cleanup</h3>
+                <p><strong>Goal:</strong> Restore environment.</p>
+                <p>Ensure no unintentional damage and restore changes made during testing.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="industry-grid">
+        <div class="industry-card">
+            <i class="fas fa-heartbeat"></i>
+            <h3>Healthcare</h3>
+            <p>Safeguarding patient data and ensuring compliance with strict regulations.</p>
+        </div>
+        <div class="industry-card">
+            <i class="fas fa-coins"></i>
+            <h3>Finance</h3>
+            <p>Enhance security of transactions and protect sensitive financial data.</p>
+        </div>
+        <div class="industry-card">
+            <i class="fas fa-building-columns"></i>
+            <h3>Government</h3>
+            <p>Securing critical infrastructure and protecting sensitive national data.</p>
+        </div>
+        <div class="industry-card">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>E-Commerce</h3>
+            <p>Safeguarding customer data and maintaining trust in online platforms.</p>
+        </div>
+    </section>
+
+    <section class="intel-section">
+        <h2 class="section-title">Latest <span>Threat Intel</span></h2>
+        <div class="intel-grid">
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-3519</span>
+                    <span class="severity sev-critical">Critical</span>
+                </div>
+                <div class="intel-body">
+                    <h4>Citrix NetScaler Code Injection</h4>
+                    <div class="intel-detail"><span>App:</span> Citrix NetScaler ADC/Gateway</div>
+                    <div class="intel-detail"><span>Vuln:</span> Improper input validation allows code injection.</div>
+                    <div class="intel-detail"><span>Impact:</span> Remote code execution.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Apply latest Citrix patches.</div>
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-4966</span>
+                    <span class="severity sev-critical">Critical</span>
+                </div>
+                <div class="intel-body">
+                    <h4>Citrix Buffer Overflow</h4>
+                    <div class="intel-detail"><span>App:</span> Citrix NetScaler ADC/Gateway</div>
+                    <div class="intel-detail"><span>Vuln:</span> Buffer overflow allows arbitrary code execution.</div>
+                    <div class="intel-detail"><span>Impact:</span> System crash / RCE.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Update per Citrix guidance.</div>
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-20198</span>
+                    <span class="severity sev-critical">Critical</span>
+                </div>
+                <div class="intel-body">
+                    <h4>Cisco IOS XE Privilege Escalation</h4>
+                    <div class="intel-detail"><span>App:</span> Cisco IOS XE Software</div>
+                    <div class="intel-detail"><span>Vuln:</span> Unauthorized users can escalate privileges via Web UI.</div>
+                    <div class="intel-detail"><span>Impact:</span> Complete system compromise.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Apply Cisco patches.</div>
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-27997</span>
+                    <span class="severity sev-critical">Critical</span>
+                </div>
+                <div class="intel-body">
+                    <h4>Fortinet SSL-VPN Overflow</h4>
+                    <div class="intel-detail"><span>App:</span> FortiOS and FortiProxy</div>
+                    <div class="intel-detail"><span>Vuln:</span> Heap-based buffer overflow.</div>
+                    <div class="intel-detail"><span>Impact:</span> Remote code execution.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Update per Fortinet guidance.</div>
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-34362</span>
+                    <span class="severity sev-critical">Critical</span>
+                </div>
+                <div class="intel-body">
+                    <h4>MOVEit Transfer SQL Injection</h4>
+                    <div class="intel-detail"><span>App:</span> Progress MOVEit Transfer</div>
+                    <div class="intel-detail"><span>Vuln:</span> SQL injection allows unauthenticated access.</div>
+                    <div class="intel-detail"><span>Impact:</span> Data access/alteration/deletion.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Apply Progress patches.</div>
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-header">
+                    <span class="cve-id">CVE-2023-22515</span>
+                    <span class="severity sev-high">High</span>
+                </div>
+                <div class="intel-body">
+                    <h4>Atlassian Broken Access Control</h4>
+                    <div class="intel-detail"><span>App:</span> Confluence Data Center</div>
+                    <div class="intel-detail"><span>Vuln:</span> Broken access control to restricted info.</div>
+                    <div class="intel-detail"><span>Impact:</span> Info disclosure.</div>
+                    <div class="intel-detail" style="border:none;"><span>Remediation:</span> Update per Atlassian guidance.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo">
+                    <img src="https://static.wixstatic.com/media/b12bd8_041938cd6f734a0aa2f940d3ef359f90~mv2.png/v1/fill/w_468,h_154,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/NATIVEDEFENCE_Logo1.png" 
+                         width="140px" height="50px" alt="NativeDefence Logo">
+                </div>
+                <p style="color: var(--text-gray); margin-top: 20px; font-size: 0.95rem; line-height: 1.8;">
+                    Expert-driven Cyber Security Services for the modern digital landscape.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nativesoc.html">NativeSOC</a></li>
+                    <li><a href="academy.html">Academy</a></li>
+                    <li><a href="vapt.html">VAPT</a></li>
+                    <li><a href="partners.html">Partners</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact Info</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> sales@nativedefence.com</p>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span>
+                            <strong>AHMEDABAD</strong><br>
+                            D-311 Ganesh Glory 11, Jagatpur Rd,<br> 
+                            Near BSNL Office, Off S G Highway,<br>
+                            Ahmedabad, Gujarat 382470
+                        </span>
+                    </p>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>
+                            <strong>KOLKATA</strong><br>
+                            8 BECK BAGAN ROW KOLKATA - 700017
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            Copyright 2023 © NATIVEDEFENCE TECH LLP. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-toggle');
+        const navLinks = document.getElementById('nav-links');
+        const icon = mobileBtn.querySelector('i');
+
+        mobileBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Create Particles
+        function createParticle() {
+            const particles = document.querySelector('.particles');
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particles.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 25000);
+        }
+
+        // Initialize particles
+        for(let i = 0; i < 20; i++) {
+            setTimeout(createParticle, i * 500);
+        }
+
+        // Continuous particle generation
+        setInterval(createParticle, 3000);
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

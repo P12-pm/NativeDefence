@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NativeSOC | Unified Security Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- GLOBAL VARIABLES & RESET --- */
+        :root {
+            --primary: #00f5ff;
+            --primary-dark: #0099aa;
+            --secondary: #7b2fff;
+            --accent: #5d00ff;
+            --neon-green: #00ff88;
+            --neon-pink: #0033ff;
+            --bg-body: #030508;
+            --bg-glass: rgba(12, 16, 28, 0.7);
+            --bg-card: rgba(20, 25, 40, 0.6);
+            --text-white: #ffffff;
+            --text-gray: #a0aab8;
+            --gradient-cyber: linear-gradient(135deg, #00f5ff, #7b2fff, #6a00ff);
+            --gradient-neon: linear-gradient(135deg, #00ff88, #00f5ff, #3300ff);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- ANIMATED BACKGROUND --- */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(0deg); }
+            100% { transform: perspective(500px) rotateX(0deg) translateY(60px); }
+        }
+
+        /* Floating Particles */
+        .particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: float-particle 15s infinite linear;
+            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+        }
+
+        @keyframes float-particle {
+            0% { 
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100vh) translateX(100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Scanning Line Effect */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scanDown 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        @keyframes scanDown {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* --- PAGE LOADER --- */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loader-wrapper.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .cyber-loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .cyber-loader::before,
+        .cyber-loader::after {
+            content: '';
+            position: absolute;
+            border: 3px solid transparent;
+            border-radius: 50%;
+        }
+
+        .cyber-loader::before {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        .cyber-loader::after {
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-bottom-color: var(--secondary);
+            animation: spin 0.8s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* --- HEADER --- */
+        header {
+            background: rgba(3, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 0 5%;
+            height: 80px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            height: 70px;
+            background: rgba(3, 5, 8, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan-line-h 3s linear infinite;
+        }
+
+        @keyframes scan-line-h {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 1px;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .logo img {
+            filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .logo img:hover {
+            filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.6));
+            transform: scale(1.05);
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .nav-links li {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links > li > a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-gray);
+            padding: 10px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links > li > a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-cyber);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links > li > a:hover::before,
+        .nav-links > li > a.active::before {
+            width: 100%;
+        }
+
+        .nav-links > li > a:hover,
+        .nav-links > li > a.active {
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+        }
+
+        .nav-links > li > a i {
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+        }
+
+        .nav-links > li:hover > a i {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            background: rgba(10, 14, 24, 0.98);
+            min-width: 260px;
+            border: 1px solid rgba(0, 245, 255, 0.15);
+            border-top: 3px solid;
+            border-image: var(--gradient-cyber) 1;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8),
+                        0 0 30px rgba(0, 245, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: block;
+            padding: 15px 0;
+            z-index: 999;
+            backdrop-filter: blur(20px);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .nav-links li:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dropdown-menu li a::before {
+            content: '▹';
+            margin-right: 10px;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu li a:hover {
+            background: linear-gradient(90deg, rgba(0, 245, 255, 0.1), transparent);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            padding-left: 30px;
+        }
+
+        .dropdown-menu li a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .cta-btn-nav {
+            padding: 12px 30px !important;
+            background: transparent;
+            border: 2px solid transparent;
+            background-image: linear-gradient(var(--bg-body), var(--bg-body)), var(--gradient-cyber);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--primary) !important;
+            transition: all 0.4s ease;
+        }
+
+        .cta-btn-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-cyber);
+            transition: 0.5s ease;
+            z-index: -1;
+        }
+
+        .cta-btn-nav:hover::before {
+            left: 0;
+        }
+
+        .cta-btn-nav:hover {
+            color: #000 !important;
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.5),
+                        0 0 60px rgba(123, 47, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.8rem;
+            color: var(--text-white);
+            cursor: pointer;
+            z-index: 1001;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--primary);
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container {
+            margin-top: 80px;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- NEW CONTENT STYLES --- */
+        .hero-section {
+            padding: 100px 5% 60px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-image: url('https://plus.unsplash.com/premium_photo-1661872680599-bfb0a671f8b1?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y3liZXJ8ZW58MHx8MHx8fDA%3D');
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: var(--gradient-cyber);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 60px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .services-section {
+            padding: 80px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-category {
+            margin-bottom: 100px;
+        }
+
+        .category-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 50px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--gradient-cyber);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .service-card {
+            background: linear-gradient(145deg, rgba(20, 25, 40, 0.7), rgba(10, 15, 30, 0.9));
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .service-card:hover::before {
+            left: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        .service-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--text-white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .service-card h3 i {
+            font-size: 1.8rem;
+            background: var(--gradient-cyber);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .service-card p {
+            color: var(--text-gray);
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            color: var(--text-gray);
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li::before {
+            content: '▹';
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .feature-list li:hover {
+            color: var(--text-white);
+            padding-left: 30px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: linear-gradient(180deg, #020203 0%, #000 100%);
+            padding: 100px 5% 30px;
+            border-top: 1px solid rgba(0, 245, 255, 0.1);
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-cyber);
+            animation: footer-scan 3s linear infinite;
+        }
+
+        @keyframes footer-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .footer-col h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 30px;
+            color: var(--text-white);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--gradient-cyber);
+            border-radius: 2px;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-links a::before {
+            content: '▹';
+            color: var(--primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 20px;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        .footer-links a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .contact-info p {
+            margin-bottom: 20px;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            display: flex;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info p:hover {
+            transform: translateX(5px);
+            color: var(--text-white);
+        }
+
+        .contact-info i {
+            color: var(--primary);
+            margin-top: 3px;
+            animation: iconGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes iconGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 245, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.8)); }
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #666;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-cyber);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Scroll To Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-cyber);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+            
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(3, 5, 8, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 30px 5%;
+                transition: 0.4s ease-in-out;
+                z-index: 998;
+                border-top: 1px solid rgba(0, 245, 255, 0.1);
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                height: auto;
+                margin-bottom: 10px;
+            }
+
+            .nav-links > li > a {
+                font-size: 1.1rem;
+                width: 100%;
+                justify-content: space-between;
+                padding: 15px 0;
+            }
+
+            .dropdown-menu {
+                position: static;
+                width: 100%;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border-top: none;
+                padding-left: 20px;
+                display: none;
+                background: transparent;
+            }
+
+            .nav-links li:hover .dropdown-menu {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .category-title {
+                font-size: 1.8rem;
+            }
+
+            .service-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .footer-col h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="loader-wrapper" id="loader">
+        <div class="cyber-loader">
+            <span class="loader-text">LOADING</span>
+        </div>
+    </div>
+
+    <!-- Background Effects -->
+    <div class="cyber-grid"></div>
+    <div class="particles-bg" id="particles"></div>
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header id="header">
+        <div class="logo">
+            <img src="https://static.wixstatic.com/media/b12bd8_041938cd6f734a0aa2f940d3ef359f90~mv2.png/v1/fill/w_468,h_154,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/NATIVEDEFENCE_Logo1.png" 
+                 width="140px" height="50px" alt="NativeDefence Logo">
+        </div>
+        
+        <nav>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li>
+                    <a href="nativesoc.html" class="active">NativeSOC <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="NativeARchitecture.html">NativeSOC Architecture</a></li>
+                        <li><a href="NativeApproach.html">NativeSOC Approach</a></li>
+                        <li><a href="NativeFeatures.html">NativeSOC Features</a></li>
+                        <li><a href="Whynative.html">Why NativeSOC</a></li>
+                        <li><a href="howitworks.html">How it works</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="academy.html">Academy <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="courses.html">Courses</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="vapt.html">VAPT <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="cyber.html">Cybersecurity</a></li>
+                    </ul>
+                </li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="aboutus.html">About Us</a></li>
+                <li><a href="contact.html" class="cta-btn-nav">Contact</a></li>
+            </ul>
+        </nav>
+        
+        <div class="mobile-menu-btn" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">NativeSOC</h1>
+            <p class="hero-description">
+                NativeSOC unifies separate functions into a single agent and platform architecture. Protection is provided for public clouds, private clouds, and on-premise data centers.
+            </p>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services-section">
+            <!-- Endpoint Security -->
+            <div class="service-category">
+                <h2 class="category-title">Endpoint Security</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3><i class="fas fa-cog"></i> Configuration Assessment</h3>
+                        <p>Security Configuration Assessment (SCA) involves assessing system settings and configurations to ensure they comply with security best practices and standards. NativeSOC has an SCA module that identifies misconfigurations and vulnerabilities on monitored endpoints. This capability helps you manage your attack surface efficiently to improve your security posture.</p>
+                        <ul class="feature-list">
+                            <li>Vulnerability Detection</li>
+                            <li>Integrated compliance Management</li>
+                            <li>System Hardening</li>
+                            <li>Continuous Monitoring</li>
+                            <li>Extensive configuration Checks</li>
+                            <li>Reporting and Analysis</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-virus-slash"></i> Malware Detection</h3>
+                        <p>Malware detection comprises strategies and tools to detect malware threats. The NativeSOC SIEM and XDR platform uses several advanced malware detection techniques for a wide range of malware, including ransomware, rootkits, spyware, adware, trojans, viruses, and worms. Leverage the following NativeSOC malware detection capabilities to secure your IT assets.</p>
+                        <ul class="feature-list">
+                            <li>Real time cross-platform protection</li>
+                            <li>Ransomware protection</li>
+                            <li>Rootkit detection</li>
+                            <li>Extensible integrations for malware detection</li>
+                            <li>Advanced rulesets and decoders</li>
+                            <li>Centralized threat visualization</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-file-shield"></i> File Integrity Monitoring</h3>
+                        <p>The NativeSOC File Integrity Monitoring (FIM) module monitors and alerts on changes to critical files and directories. This module helps organizations meet compliance requirements and quickly detect file changes that indicate a compromise or cyber-attack.</p>
+                        <ul class="feature-list">
+                            <li>Real Time monitoring</li>
+                            <li>Security Breach Detection</li>
+                            <li>Regulatory Compliance</li>
+                            <li>Centralized Management</li>
+                            <li>Scalability</li>
+                            <li>Cross Platform Support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat Intelligence -->
+            <div class="service-category">
+                <h2 class="category-title">Threat Intelligence</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3><i class="fas fa-crosshairs"></i> Threat Hunting</h3>
+                        <p>NativeSOC is a leading security solution that equips organizations with the necessary tools and capabilities to detect and prevent persistent attacks. With advanced threat hunting capabilities, security teams can stay proactive in identifying and eliminating emerging threats and defend their business processes effectively.</p>
+                        <ul class="feature-list">
+                            <li>Comprehensive Visibility</li>
+                            <li>Log Retention, Indexing and Query</li>
+                            <li>MITRE Attack Mapping</li>
+                            <li>Threat Intelligence</li>
+                            <li>Tailored Ruleset</li>
+                            <li>Command Monitoring</li>
+                            <li>Customizable Dashboard</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-chart-line"></i> Log Data Analysis</h3>
+                        <p>Log data analysis involves reviewing logs generated by network devices, endpoints, and applications to gain visibility into an IT infrastructure. Log data analysis helps security teams to meet regulatory requirements, detect and remediate threats, and identify application errors and other security issues. NativeSOC collects, analyzes, and stores logs from your infrastructure in real-time.</p>
+                        <ul class="feature-list">
+                            <li>Security threat detection</li>
+                            <li>Regulatory Compliance</li>
+                            <li>Seamless integration with third party solutions</li>
+                            <li>Holistic view of an entire IT infrastructure</li>
+                            <li>Scalability and Performance</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-bug"></i> Vulnerability Detection</h3>
+                        <p>NativeSOC offers a complete suite of capabilities to help you protect your IT infrastructure against vulnerabilities and cyber threats. Using a risk-based approach to prioritize vulnerabilities, NativeSOC makes it easier for security teams to focus on the most critical issues first.</p>
+                        <ul class="feature-list">
+                            <li>Simplified query and analysis</li>
+                            <li>Automated vulnerability detection</li>
+                            <li>Asset visibility</li>
+                            <li>Risk Prioritization</li>
+                            <li>Multi Platform Compatibility</li>
+                            <li>Security Configuration Assessment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Operations -->
+            <div class="service-category">
+                <h2 class="category-title">Security Operations</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Incident Response</h3>
+                        <p>Incident response is the set of actions and processes organizations take to respond to threats detected in their infrastructure. It helps mitigate the impact of cyber-attacks on critical assets and business operations. NativeSOC helps security teams quickly detect, analyze, and effectively respond to security incidents.</p>
+                        <ul class="feature-list">
+                            <li>Automated Incident response</li>
+                            <li>Streamlined operations</li>
+                            <li>Third Party integrations</li>
+                            <li>Reduced dwell time</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-clipboard-check"></i> Regulatory Compliance</h3>
+                        <p>NativeSOC simplifies the fulfillment of regulatory compliance obligations by offering a robust solution that addresses the specific requirements of industry standards. NativeSOC helps to meet the technical requirements of regulatory standards such as PCI DSS, HIPAA, GDPR, and others.</p>
+                        <ul class="feature-list">
+                            <li>Audit Infrastructure</li>
+                            <li>Streamline Compliance activities</li>
+                            <li>Support for several compliance standards</li>
+                            <li>Create custom policies and security controls</li>
+                            <li>Generate compliance report</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-heartbeat"></i> IT Hygiene</h3>
+                        <p>IT hygiene refers to the best practices and measures that help to maintain the security, availability, and efficiency of an organization's IT infrastructure. Threat actors typically take advantage of security weaknesses when there is poor IT hygiene. Organizations need to implement good IT hygiene practices to prevent cyberattacks, data breaches, and other security threats that can lead to data loss, service disruption, reputational damage, or financial instability. NativeSOC helps maintain the IT hygiene of your infrastructure, including on-premises and cloud workloads.</p>
+                        <ul class="feature-list">
+                            <li>System inventory</li>
+                            <li>Security Configuration Assessment</li>
+                            <li>Regulatory Compliance</li>
+                            <li>Vulnerability Management</li>
+                            <li>Malware Detection</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cloud Security -->
+            <div class="service-category">
+                <h2 class="category-title">Cloud Security</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3><i class="fas fa-cube"></i> Container Security</h3>
+                        <p>Container security involves the implementation of security measures to protect containers and the underlying infrastructure from potential threats throughout their lifecycle. NativeSOC helps organizations secure their containerized environments by providing real-time monitoring and threat detection.</p>
+                        <ul class="feature-list">
+                            <li>Threat Detection</li>
+                            <li>Auditing orchestration platforms</li>
+                            <li>Container Health monitoring</li>
+                            <li>Monitor container runtime</li>
+                            <li>Container inventory</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-cloud-upload-alt"></i> Posture Management</h3>
+                        <p>Cloud security posture management (CSPM) involves evaluating, enhancing, and maintaining an organization's cloud security posture. It helps secure workloads in cloud environments by identifying security risks and ensuring compliance with regulatory standards.</p>
+                        <ul class="feature-list">
+                            <li>Cloud provider integration</li>
+                            <li>Cloud security configuration assessment</li>
+                            <li>Regulatory compliance</li>
+                            <li>Incidence response</li>
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <h3><i class="fas fa-cloud"></i> Cloud Workload Protection</h3>
+                        <p>Cloud workload protection is a practice that ensures all cloud resources are adequately monitored and protected. NativeSOC protects cloud workloads on platforms like Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), and Office 365.</p>
+                        <ul class="feature-list">
+                            <li>Log analysis</li>
+                            <li>Threat detection and response</li>
+                            <li>Vulnerability management</li>
+                            <li>File integrity monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo">
+                    <img src="https://static.wixstatic.com/media/b12bd8_041938cd6f734a0aa2f940d3ef359f90~mv2.png/v1/fill/w_468,h_154,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/NATIVEDEFENCE_Logo1.png" 
+                         width="140px" height="50px" alt="NativeDefence Logo">
+                </div>
+                <p style="color: var(--text-gray); margin-top: 20px; font-size: 0.95rem; line-height: 1.8;">
+                    Expert-driven Cyber Security Services for the modern digital landscape.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nativesoc.html">NativeSOC</a></li>
+                    <li><a href="academy.html">Academy</a></li>
+                    <li><a href="vapt.html">VAPT</a></li>
+                    <li><a href="partners.html">Partners</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Contact Info</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> sales@nativedefence.com</p>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span>
+                            <strong>AHMEDABAD</strong><br>
+                            D-311 Ganesh Glory 11, Jagatpur Rd,<br> 
+                            Near BSNL Office, Off S G Highway,<br>
+                            Ahmedabad, Gujarat 382470
+                        </span>
+                    </p>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>
+                            <strong>KOLKATA</strong><br>
+                            8 BECK BAGAN ROW KOLKATA - 700017
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            Copyright 2023 © NATIVEDEFENCE TECH LLP. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Scroll To Top Button -->
+    <div class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Page Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        // Toggle Mobile Menu
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+
+            // Show/Hide Scroll Top Button
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Scroll To Top
+        document.getElementById('scrollTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Create Particles
+        function createParticle() {
+            const particles = document.getElementById('particles');
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            particles.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 20000);
+        }
+
+        // Initialize particles
+        for(let i = 0; i < 40; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+
+        // Continuous particle generation
+        setInterval(createParticle, 1500);
+
+        // Add hover effect to dropdown menu items
+        document.querySelectorAll('.nav-links li').forEach(item => {
+            if (item.querySelector('.dropdown-menu')) {
+                item.addEventListener('mouseenter', () => {
+                    item.classList.add('dropdown-open');
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.classList.remove('dropdown-open');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
